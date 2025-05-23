@@ -7,7 +7,11 @@ module.exports = {
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest'
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: {
+        esModuleInterop: true
+      }
+    }]
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -37,12 +41,5 @@ module.exports = {
   verbose: true,
   errorOnDeprecated: true,
   clearMocks: true,
-  restoreMocks: true,
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        esModuleInterop: true
-      }
-    }
-  }
+  restoreMocks: true
 };

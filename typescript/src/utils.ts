@@ -1,7 +1,7 @@
 import { Logger } from '@aws-lambda-powertools/logger';
-import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
+import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 
-import type { ApiResponse, CrudOperation, HttpMethod, RequestContext, Result } from './types';
+import type { CrudOperation, HttpMethod, RequestContext, Result } from './types';
 import { STANDARD_HEADERS, ValidationError, isString, isValidHttpMethod } from './types';
 
 /**
@@ -9,7 +9,7 @@ import { STANDARD_HEADERS, ValidationError, isString, isValidHttpMethod } from '
  */
 export const logger = new Logger({
   serviceName: 'typescript-lambda-crud',
-  logLevel: process.env.LOG_LEVEL ?? 'INFO'
+  logLevel: (process.env['LOG_LEVEL'] ?? 'INFO') as 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
 });
 
 /**
@@ -193,7 +193,7 @@ export function createRequestContext(
       event,
       context,
       operation: operationResult.value,
-      resourceId
+      resourceId: resourceId
     }
   };
 }

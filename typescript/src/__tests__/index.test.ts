@@ -86,10 +86,13 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      expect(result.headers?.['Content-Type']).toBe('application/json');
+      expect(typeof result).toBe('object');
+      expect(result).toHaveProperty('statusCode');
+      const objResult = result as { statusCode: number; headers?: Record<string, string>; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      expect(objResult.headers?.['Content-Type']).toBe('application/json');
       
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; data: { operation: string } };
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; data: { operation: string } };
       expect(body.success).toBe(true);
       expect(body.data.operation).toBe('CREATE');
       
@@ -100,14 +103,16 @@ describe('Lambda Handler', () => {
     it('should handle POST request with empty body', async () => {
       // Arrange
       mockEvent.requestContext.http.method = 'POST';
-      mockEvent.body = undefined;
+      delete mockEvent.body;
 
       // Act
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean };
       expect(body.success).toBe(true);
       expect(mockConsoleLog).toHaveBeenCalledWith('Request Body: (empty)');
     });
@@ -121,8 +126,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(400);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; error: { name: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(400);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; error: { name: string } };
       expect(body.success).toBe(false);
       expect(body.error.name).toBe('ValidationError');
     });
@@ -138,8 +145,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; data: { operation: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; data: { operation: string } };
       expect(body.success).toBe(true);
       expect(body.data.operation).toBe('READ');
       
@@ -156,8 +165,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; data: { resourceId: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; data: { resourceId: string } };
       expect(body.success).toBe(true);
       expect(body.data.resourceId).toBe('item-123');
       
@@ -179,8 +190,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; data: { operation: string; resourceId: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; data: { operation: string; resourceId: string } };
       expect(body.success).toBe(true);
       expect(body.data.operation).toBe('UPDATE');
       expect(body.data.resourceId).toBe('item-456');
@@ -199,8 +212,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; data: { operation: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; data: { operation: string } };
       expect(body.success).toBe(true);
       expect(body.data.operation).toBe('UPDATE');
     });
@@ -208,15 +223,17 @@ describe('Lambda Handler', () => {
     it('should reject UPDATE request without resource ID', async () => {
       // Arrange
       mockEvent.requestContext.http.method = 'PUT';
-      mockEvent.pathParameters = undefined;
+      delete mockEvent.pathParameters;
       mockEvent.body = JSON.stringify({ name: 'Updated Item' });
 
       // Act
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(400);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; error: { message: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(400);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; error: { message: string } };
       expect(body.success).toBe(false);
       expect(body.error.message).toContain('Resource ID required');
     });
@@ -232,8 +249,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; data: { operation: string; resourceId: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(200);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; data: { operation: string; resourceId: string } };
       expect(body.success).toBe(true);
       expect(body.data.operation).toBe('DELETE');
       expect(body.data.resourceId).toBe('item-999');
@@ -250,8 +269,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(400);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; error: { message: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(400);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; error: { message: string } };
       expect(body.success).toBe(false);
       expect(body.error.message).toContain('Resource ID required');
     });
@@ -266,8 +287,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(400);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; error: { message: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(400);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; error: { message: string } };
       expect(body.success).toBe(false);
       expect(body.error.message).toContain('Invalid HTTP method');
     });
@@ -281,8 +304,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(400);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; error: { name: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(400);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; error: { name: string } };
       expect(body.success).toBe(false);
       expect(body.error.name).toBe('ValidationError');
     });
@@ -295,7 +320,9 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.headers).toMatchObject({
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; headers?: Record<string, string> };
+      expect(objResult.headers).toMatchObject({
         'Content-Type': 'application/json',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
@@ -316,8 +343,10 @@ describe('Lambda Handler', () => {
       const result = await handler(mockEvent, mockContext);
 
       // Assert
-      expect(result.statusCode).toBe(500);
-      const body = JSON.parse(result.body ?? '{}') as { success: boolean; error: { name: string } };
+      expect(typeof result).toBe('object');
+      const objResult = result as { statusCode: number; body?: string };
+      expect(objResult.statusCode).toBe(500);
+      const body = JSON.parse(objResult.body ?? '{}') as { success: boolean; error: { name: string } };
       expect(body.success).toBe(false);
       expect(body.error.name).toBe('Error');
       expect(logger.error).toHaveBeenCalled();

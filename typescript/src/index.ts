@@ -1,7 +1,7 @@
 import { Tracer } from '@aws-lambda-powertools/tracer';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 
-import { AuthorizationError, NotFoundError, ValidationError } from './types';
+import { AuthorizationError, NotFoundError, RequestContext, ValidationError } from './types';
 import {
   createRequestContext,
   errorResponse,

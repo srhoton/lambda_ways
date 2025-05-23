@@ -1,4 +1,4 @@
-import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Context } from 'aws-lambda';
+import type { APIGatewayProxyEventV2, Context } from 'aws-lambda';
 
 /**
  * Supported HTTP methods for CRUD operations
@@ -50,7 +50,7 @@ export type Result<T, E = Error> =
 /**
  * API response structure
  */
-export interface ApiResponse<T = unknown> {
+export interface ApiResponse {
   statusCode: number;
   headers: Record<string, string>;
   body: string;
@@ -63,7 +63,7 @@ export interface RequestContext {
   event: APIGatewayProxyEventV2;
   context: Context;
   operation: CrudOperation;
-  resourceId?: string;
+  resourceId: string | undefined;
 }
 
 /**

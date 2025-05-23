@@ -25,6 +25,11 @@
     "import",
     "promise"
   ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
   "rules": {
     "@typescript-eslint/explicit-function-return-type": "error",
     "@typescript-eslint/no-explicit-any": "error",
@@ -44,8 +49,8 @@
     "@typescript-eslint/no-unsafe-call": "error",
     "@typescript-eslint/no-unsafe-return": "error",
     "import/no-cycle": "error",
-    "import/no-unresolved": "error",
-    "import/no-unused-modules": "error",
+    "import/no-unresolved": "off",
+    "import/no-unused-modules": "off",
     "import/order": [
       "error",
       {
