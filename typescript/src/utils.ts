@@ -9,7 +9,7 @@ import { STANDARD_HEADERS, ValidationError, isString, isValidHttpMethod } from '
  */
 export const logger = new Logger({
   serviceName: 'typescript-lambda-crud',
-  logLevel: (process.env['LOG_LEVEL'] ?? 'INFO') as 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
+  logLevel: (process.env['LOG_LEVEL'] ?? 'INFO') as 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'CRITICAL' | 'SILENT'
 });
 
 /**

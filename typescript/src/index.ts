@@ -28,7 +28,11 @@ export const handler = async (
   context: Context
 ): Promise<APIGatewayProxyResultV2> => {
   // Add correlation IDs to logs
-  logger.addContext(context);
+  logger.addPersistentLogAttributes({
+    lambdaContext: context,
+    awsRequestId: context.awsRequestId,
+    functionName: context.functionName,
+  });
   
   // Start X-Ray segment
   const segment = tracer.getSegment();
@@ -79,10 +83,11 @@ export const handler = async (
         await handleDelete(requestContext);
         break;
         
-      default:
+      default: {
         // This should never happen due to type checking, but satisfies exhaustiveness
         const exhaustiveCheck: never = requestContext.operation;
         throw new Error(`Unhandled operation: ${exhaustiveCheck}`);
+      }
     }
     
     // Return success response

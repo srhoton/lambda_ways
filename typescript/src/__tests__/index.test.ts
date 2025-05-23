@@ -4,16 +4,21 @@ import { handler } from '../index';
 import { logger } from '../utils';
 
 // Mock the logger to prevent console output during tests
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  logger: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-    addContext: jest.fn()
-  }
-}));
+jest.mock('../utils', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const originalModule = jest.requireActual('../utils');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return {
+    ...originalModule,
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+      addPersistentLogAttributes: jest.fn()
+    }
+  };
+});
 
 // Mock console.log to verify output
 const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
@@ -281,7 +286,7 @@ describe('Lambda Handler', () => {
   describe('Error handling', () => {
     it('should handle unsupported HTTP method', async () => {
       // Arrange
-      (mockEvent.requestContext.http as any).method = 'CONNECT';
+      (mockEvent.requestContext.http as { method: string }).method = 'CONNECT';
 
       // Act
       const result = await handler(mockEvent, mockContext);
@@ -337,7 +342,7 @@ describe('Lambda Handler', () => {
       // Arrange
       mockEvent.requestContext.http.method = 'GET';
       // Force an error by making pathParameters a non-object
-      (mockEvent as any).pathParameters = 'invalid';
+      (mockEvent as unknown as { pathParameters: string }).pathParameters = 'invalid';
 
       // Act
       const result = await handler(mockEvent, mockContext);
@@ -363,7 +368,11 @@ describe('Lambda Handler', () => {
       await handler(mockEvent, mockContext);
 
       // Assert
-      expect(logger.addContext).toHaveBeenCalledWith(mockContext);
+      expect(logger.addPersistentLogAttributes).toHaveBeenCalledWith({
+        lambdaContext: mockContext,
+        awsRequestId: mockContext.awsRequestId,
+        functionName: mockContext.functionName,
+      });
       expect(logger.info).toHaveBeenCalledWith(
         'Incoming request',
         expect.objectContaining({

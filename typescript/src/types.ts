@@ -15,7 +15,7 @@ export type CrudOperation = 'CREATE' | 'READ' | 'UPDATE' | 'DELETE';
  */
 export class ValidationError extends Error {
   constructor(public readonly field: string, public readonly value: unknown) {
-    super(`Validation failed for field ${field}`);
+    super(`Validation failed for field ${field} with value: ${JSON.stringify(value)}`);
     this.name = 'ValidationError';
   }
 }
