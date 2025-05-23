@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Build output
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# AWS SAM
+.aws-sam/
+samconfig.toml
+
+# Lambda deployment packages
+*.zip
+lambda-deployment/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# TypeScript cache
+*.tscache
+tsconfig.tsbuildinfo
+
+# Jest
+jest_html_report/
+test-report.xml
+
+# ESLint
+.eslintcache
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
