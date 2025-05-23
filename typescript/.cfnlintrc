@@ -1,0 +1,9 @@
+{
+  "templates": [
+    "template.yaml"
+  ],
+  "ignore_checks": [
+    "W3002",
+    "W2001"
+  ]
+}

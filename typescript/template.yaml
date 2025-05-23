@@ -6,7 +6,7 @@ Globals:
   Function:
     Timeout: 30
     MemorySize: 512
-    Runtime: nodejs18.x
+    Runtime: nodejs20.x
     Tracing: Active
     Environment:
       Variables:
@@ -39,7 +39,14 @@ Resources:
           AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
       Policies:
         - AWSXRayDaemonWriteAccess
-        - CloudWatchLogsFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-crud-handler:*'
       Events:
         ApiGatewayEvent:
           Type: HttpApi
@@ -54,9 +61,9 @@ Resources:
       StageName: !Ref AWS::StackName
       CorsConfiguration:
         AllowOrigins:
-          - "*"
+          - '*'
         AllowHeaders:
-          - "*"
+          - '*'
         AllowMethods:
           - GET
           - POST
@@ -65,11 +72,10 @@ Resources:
           - DELETE
           - OPTIONS
         MaxAge: 300
-      Auth:
-        DefaultAuthorizer: NONE
+
       AccessLogSettings:
         DestinationArn: !GetAtt ApiLogGroup.Arn
-        Format: '$context.requestId $context.error.message $context.error.messageString $context.integration.error $context.integration.integrationStatus $context.integration.latency $context.integration.requestId $context.integration.status $context.path $context.routeKey $context.stage $context.status'
+        Format: $context.requestId
 
   ApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -86,7 +92,7 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: HTTP API endpoint URL
-    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${AWS::StackName}
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${AWS::StackName}'
     Export:
       Name: !Sub ${AWS::StackName}-ApiEndpoint
 
