@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: TypeScript Lambda CRUD Handler with API Gateway
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: nodejs20.x
+    Tracing: Active
+    Environment:
+      Variables:
+        LOG_LEVEL: !Ref LogLevel
+        NODE_OPTIONS: --enable-source-maps
+
+Parameters:
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues:
+      - DEBUG
+      - INFO
+      - WARN
+      - ERROR
+    Description: Logging level for the Lambda function
+
+Resources:
+  CrudLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-crud-handler
+      CodeUri: .
+      Handler: dist/index.handler
+      Description: TypeScript Lambda for handling CRUD operations from API Gateway
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+      Policies:
+        - AWSXRayDaemonWriteAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-crud-handler:*'
+      Events:
+        ApiGatewayEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            ApiId: !Ref HttpApi
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref AWS::StackName
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowHeaders:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        MaxAge: 300
+
+      AccessLogSettings:
+        DestinationArn: !GetAtt ApiLogGroup.Arn
+        Format: $context.requestId
+
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/apigateway/${AWS::StackName}
+      RetentionInDays: 7
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${CrudLambdaFunction}
+      RetentionInDays: 7
+
+Outputs:
+  ApiEndpoint:
+    Description: HTTP API endpoint URL
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${AWS::StackName}'
+    Export:
+      Name: !Sub ${AWS::StackName}-ApiEndpoint
+
+  LambdaFunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt CrudLambdaFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-LambdaArn
+
+  LambdaFunctionName:
+    Description: Lambda Function Name
+    Value: !Ref CrudLambdaFunction
+    Export:
+      Name: !Sub ${AWS::StackName}-LambdaName
