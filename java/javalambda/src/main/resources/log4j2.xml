@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.amazonaws.services.lambda.runtime.log4j2">
+    <Appenders>
+        <Lambda name="Lambda">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </Lambda>
+    </Appenders>
+    
+    <Loggers>
+        <!-- Set logging level for our application -->
+        <Logger name="com.steverhoton.poc" level="INFO" additivity="false">
+            <AppenderRef ref="Lambda"/>
+        </Logger>
+        
+        <!-- Root logger -->
+        <Root level="INFO">
+            <AppenderRef ref="Lambda"/>
+        </Root>
+    </Loggers>
+</Configuration>
