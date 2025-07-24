@@ -339,7 +339,7 @@ describe('Lambda Handler', () => {
       // Arrange
       mockEvent.requestContext.http.method = 'GET';
       // Force an error by creating invalid event structure
-      delete (mockEvent as any).requestContext;
+      delete (mockEvent as unknown as { requestContext?: unknown }).requestContext;
 
       // Act
       const result = await handler(mockEvent, mockContext);
